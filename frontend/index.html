@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Content Moderator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
+  <div class="bg-white shadow-lg rounded-xl p-6 w-full max-w-xl space-y-6">
+    <h1 class="text-2xl font-semibold text-gray-800 text-center">🛡️ Content Moderator</h1>
+    
+    <textarea id="textInput" placeholder="Masukkan teks untuk moderasi..."
+      class="w-full h-40 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+    ></textarea>
+    
+    <button onclick="submitText()"
+      class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition">
+      🚀 Moderate
+    </button>
+    
+    <div id="resultBox" class="hidden bg-gray-50 p-4 rounded border border-gray-200">
+      <p><strong>Toxicity Score:</strong> <span id="toxicityScore"></span></p>
+      <p><strong>Is Toxic?</strong> <span id="isToxic" class="font-bold"></span></p>
+      <p><strong>Category:</strong> <span id="category"></span></p>
+    </div>
+  </div>
+
+  <script>
+    async function submitText() {
+      const text = document.getElementById("textInput").value;
+      const resBox = document.getElementById("resultBox");
+
+      const response = await fetch("/moderate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+
+      const data = await response.json();
+      document.getElementById("toxicityScore").textContent = data.toxicity_score;
+      document.getElementById("isToxic").textContent = data.is_toxic ? "Yes 🔥" : "No ✅";
+      document.getElementById("isToxic").className = data.is_toxic
+        ? "text-red-600 font-bold"
+        : "text-green-600 font-bold";
+      document.getElementById("category").textContent = data.category;
+      resBox.classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
